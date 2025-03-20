@@ -76,17 +76,17 @@ def test_single_sample(model, X, y, class_names, mapped):
     plt.axis('off')
     plt.show()
 
-def evaluate_single_image(model, filepath, class_names):
+def evaluate_single_image(model, filepath, class_names, show_graphs=True):
     img = load_and_preprocess_image(filepath)
     print(f"DEBUG: Original image - mean: {img.mean():.3f}, std: {img.std():.3f}")
-    
-    pred_prob = model.predict(np.expand_dims(img, axis=0))
-    pred_idx = np.argmax(pred_prob)
-    plt.imshow(img.squeeze(), cmap='gray')
-    plt.title(f"Original Predicted: {class_names[pred_idx]}")
-    plt.axis('off')
-    plt.show()
-    # print("Original prediction probabilities:", pred_prob)
+    if show_graphs:
+        pred_prob = model.predict(np.expand_dims(img, axis=0))
+        pred_idx = np.argmax(pred_prob)
+        plt.imshow(img.squeeze(), cmap='gray')
+        plt.title(f"Original Predicted: {class_names[pred_idx]}")
+        plt.axis('off')
+        plt.show()
+        # print("Original prediction probabilities:", pred_prob)
     
     enhanced_img = enhance_character_image_adaptive(img)
     # print(f"DEBUG: Enhanced image (before resize) - mean: {enhanced_img.mean():.3f}, std: {enhanced_img.std():.3f}")
@@ -96,8 +96,10 @@ def evaluate_single_image(model, filepath, class_names):
     
     pred_prob_enh = model.predict(np.expand_dims(enhanced_img_resized, axis=0))
     pred_idx_enh = np.argmax(pred_prob_enh)
-    plt.imshow(enhanced_img_resized.squeeze(), cmap='gray')
-    plt.title(f"Enhanced Predicted: {class_names[pred_idx_enh]}")
-    plt.axis('off')
-    plt.show()
+    if show_graphs:
+        plt.imshow(enhanced_img_resized.squeeze(), cmap='gray')
+        plt.title(f"Enhanced Predicted: {class_names[pred_idx_enh]}")
+        plt.axis('off')
+        plt.show()
+    return class_names[pred_idx_enh]
     # print("Enhanced prediction probabilities:", pred_prob_enh)
