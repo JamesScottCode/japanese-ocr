@@ -4,3 +4,6 @@ tensorflow
 pillow
 numpy
 h5py
+matplotlib
+scikit-learn
+scipy
