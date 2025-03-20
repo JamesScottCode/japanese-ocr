@@ -4,6 +4,8 @@ import uvicorn
 import tempfile
 import os
 import json
+import time
+import asyncio
 from tensorflow.keras.models import load_model
 from models.evaluation import evaluate_single_image
 from utils import set_japanese_font
@@ -34,10 +36,7 @@ with open(CLASS_NAMES_PATH, "r") as f:
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    """
-    Endpoint to predict the class of an uploaded image.
-    The uploaded file is temporarily saved and passed to evaluate_single_image.
-    """
+    start_time = time.time()
     # Save the uploaded file to a temporary file
     suffix = os.path.splitext(file.filename)[-1]
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
@@ -45,14 +44,17 @@ async def predict(file: UploadFile = File(...)):
         tmp_path = tmp.name
 
     try:
-        # Use your evaluation function to predict the class
-        prediction = evaluate_single_image(model, tmp_path, class_names)
+        # Offload the heavy evaluation call to a separate thread
+        prediction = await asyncio.to_thread(evaluate_single_image, model, tmp_path, class_names)
     except Exception as e:
         os.remove(tmp_path)
         return {"error": str(e)}
     
     # Clean up the temporary file
     os.remove(tmp_path)
+    
+    elapsed_time = time.time() - start_time
+    print(f"Inference completed in {elapsed_time:.2f} seconds")
     
     return {"predicted_class": prediction}
 
