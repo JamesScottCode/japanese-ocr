@@ -9,6 +9,8 @@ import asyncio
 from tensorflow.keras.models import load_model
 from models.evaluation import evaluate_single_image
 from utils import set_japanese_font
+import matplotlib
+matplotlib.use("Agg")
 
 app = FastAPI()
 

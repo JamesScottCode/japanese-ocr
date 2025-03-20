@@ -76,7 +76,7 @@ def test_single_sample(model, X, y, class_names, mapped):
     plt.axis('off')
     plt.show()
 
-def evaluate_single_image(model, filepath, class_names, show_graphs=True):
+def evaluate_single_image(model, filepath, class_names, show_graphs=False):
     img = load_and_preprocess_image(filepath)
     print(f"DEBUG: Original image - mean: {img.mean():.3f}, std: {img.std():.3f}")
     if show_graphs:
