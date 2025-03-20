@@ -1,10 +1,2 @@
 fastapi
 uvicorn
-tensorflow-cpu
-pillow
-numpy
-h5py
-matplotlib
-scikit-learn
-scipy
-python-multipart
