@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders
+venv/
+env/
+.venv/
+.env/
+
+# VSCode settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Cache files
+*.log
+*.pot
+*.mo
+
+# Python egg
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+*.env
+
+# Folder to ignore
+imgs/
+
+# Specific file to ignore
+ETL5C
+ETL5INFO
