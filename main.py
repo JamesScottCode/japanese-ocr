@@ -15,7 +15,7 @@ app = FastAPI()
 # Enable CORS (adjust origins as needed)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # You can restrict this to your frontend domain in production.
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,27 +34,38 @@ print(f"Model loaded from {MODEL_PATH}")
 with open(CLASS_NAMES_PATH, "r") as f:
     class_names = json.load(f)
 
+# A simple ping endpoint for basic testing
+@app.get("/ping")
+async def ping():
+    return {"status": "ok"}
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     start_time = time.time()
+    print("Received request for prediction")
+    
     # Save the uploaded file to a temporary file
     suffix = os.path.splitext(file.filename)[-1]
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(await file.read())
         tmp_path = tmp.name
-
+    print(f"File saved to {tmp_path}")
+    
     try:
         # Offload the heavy evaluation call to a separate thread
-        prediction = await asyncio.to_thread(evaluate_single_image, model, tmp_path, class_names)
+        inference_start = time.time()
+        prediction = await asyncio.to_thread(evaluate_single_image, model, tmp_path, class_names, show_graphs=False)
+        inference_time = time.time() - inference_start
+        print(f"Inference took {inference_time:.2f} seconds")
     except Exception as e:
         os.remove(tmp_path)
+        print(f"Error during inference: {e}")
         return {"error": str(e)}
     
     # Clean up the temporary file
     os.remove(tmp_path)
-    
-    elapsed_time = time.time() - start_time
-    print(f"Inference completed in {elapsed_time:.2f} seconds")
+    total_time = time.time() - start_time
+    print(f"Total processing time: {total_time:.2f} seconds")
     
     return {"predicted_class": prediction}
 
